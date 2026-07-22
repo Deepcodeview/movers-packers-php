@@ -410,12 +410,14 @@ const styles = StyleSheet.create({
   pickerBorder: {
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    borderRadius: 6,
+    borderRadius: 8,
     backgroundColor: '#F8FAFC',
-    overflow: 'hidden',
+    justifyContent: 'center',
   },
   picker: {
-    height: 40,
+    height: 50,
+    width: '100%',
+    color: '#0F172A',
   },
   modalActions: {
     flexDirection: 'row',

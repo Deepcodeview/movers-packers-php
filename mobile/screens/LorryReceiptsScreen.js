@@ -216,7 +216,10 @@ export default function LorryReceiptsScreen() {
           ListEmptyComponent={
             <Text style={styles.emptyText}>No lorry receipts generated yet.</Text>
           }
-             <Modal visible={modalVisible} animationType="slide">
+        />
+      )}
+
+      <Modal visible={modalVisible} animationType="slide">
         <SafeAreaView style={styles.modalContainer}>
           <KeyboardAvoidingView 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
@@ -513,12 +516,14 @@ const styles = StyleSheet.create({
   pickerBorder: {
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    borderRadius: 6,
+    borderRadius: 8,
     backgroundColor: '#F8FAFC',
-    overflow: 'hidden',
+    justifyContent: 'center',
   },
   picker: {
-    height: 40,
+    height: 50,
+    width: '100%',
+    color: '#0F172A',
   },
   modalActions: {
     flexDirection: 'row',
