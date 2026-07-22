@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import LorryReceiptsScreen from './LorryReceiptsScreen';
 import PaymentsScreen from './PaymentsScreen';
+import AuditsScreen from './AuditsScreen';
 
 export default function OperationsScreen({ route }) {
-  const [activeSegment, setActiveSegment] = useState('bilty'); // 'bilty' or 'payments'
+  const [activeSegment, setActiveSegment] = useState('bilty'); // 'bilty', 'payments', or 'audits'
 
   useEffect(() => {
     if (route?.params?.activeSegment) {
@@ -21,7 +22,7 @@ export default function OperationsScreen({ route }) {
           onPress={() => setActiveSegment('bilty')}
         >
           <Text style={[styles.segmentText, activeSegment === 'bilty' && styles.activeSegmentText]}>
-            🚛 Lorry Receipts (Bilty)
+            🚛 Bilty
           </Text>
         </TouchableOpacity>
         <TouchableOpacity 
@@ -29,7 +30,15 @@ export default function OperationsScreen({ route }) {
           onPress={() => setActiveSegment('payments')}
         >
           <Text style={[styles.segmentText, activeSegment === 'payments' && styles.activeSegmentText]}>
-            💸 Collections (Receipts)
+            💸 Collections
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.segmentBtn, activeSegment === 'audits' && styles.activeSegmentBtn]}
+          onPress={() => setActiveSegment('audits')}
+        >
+          <Text style={[styles.segmentText, activeSegment === 'audits' && styles.activeSegmentText]}>
+            📋 GST & Audits
           </Text>
         </TouchableOpacity>
       </View>
@@ -38,8 +47,10 @@ export default function OperationsScreen({ route }) {
       <View style={styles.contentContainer}>
         {activeSegment === 'bilty' ? (
           <LorryReceiptsScreen />
-        ) : (
+        ) : activeSegment === 'payments' ? (
           <PaymentsScreen />
+        ) : (
+          <AuditsScreen />
         )}
       </View>
     </SafeAreaView>

@@ -462,6 +462,67 @@ switch ($action) {
         send_success(['message' => 'Payment logged successfully!']);
         break;
 
+    case 'gst_audit':
+        $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01');
+        $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+        
+        $invoices = db_get_table('invoices');
+        $filtered = [];
+        $totals = [
+            'taxable' => 0,
+            'cgst' => 0,
+            'sgst' => 0,
+            'igst' => 0,
+            'gst' => 0,
+            'sales' => 0
+        ];
+        
+        foreach ($invoices as $inv) {
+            if ($inv['status'] === 'Draft' || $inv['status'] === 'Cancelled') {
+                continue;
+            }
+            $inv_date = date('Y-m-d', strtotime($inv['invoice_date']));
+            if ($inv_date >= $start_date && $inv_date <= $end_date) {
+                $c = db_find('customers', $inv['customer_id']);
+                $taxable = ($inv['gst_type'] === 'freight_only') ? (float)$inv['freight_charge'] : (float)$inv['subtotal'];
+                
+                $inv_item = [
+                    'id' => $inv['id'],
+                    'invoice_no' => $inv['invoice_number'],
+                    'invoice_date' => $inv['invoice_date'],
+                    'customer_name' => $c ? $c['name'] : 'Unknown',
+                    'customer_gstin' => $c ? trim($c['gstin']) : '',
+                    'state' => $c ? trim($c['state']) : 'Odisha',
+                    'taxable_amount' => $taxable,
+                    'gst_rate' => (float)$inv['gst_rate'],
+                    'cgst' => (float)$inv['cgst_amount'],
+                    'sgst' => (float)$inv['sgst_amount'],
+                    'igst' => (float)$inv['igst_amount'],
+                    'gst_amount' => (float)$inv['gst_amount'],
+                    'grand_total' => (float)$inv['grand_total'],
+                    'status' => $inv['status']
+                ];
+                
+                $filtered[] = $inv_item;
+                $totals['taxable'] += $taxable;
+                $totals['cgst'] += $inv_item['cgst'];
+                $totals['sgst'] += $inv_item['sgst'];
+                $totals['igst'] += $inv_item['igst'];
+                $totals['gst'] += $inv_item['gst_amount'];
+                $totals['sales'] += $inv_item['grand_total'];
+            }
+        }
+        send_success(['invoices' => $filtered, 'totals' => $totals, 'start_date' => $start_date, 'end_date' => $end_date]);
+        break;
+
+    case 'audit_logs':
+        $logs = db_get_table('audit_log');
+        usort($logs, function($a, $b) {
+            return (int)$b['id'] - (int)$a['id'];
+        });
+        send_success(['logs' => $logs]);
+        break;
+
     default:
         send_error('Invalid API action request');
         break;

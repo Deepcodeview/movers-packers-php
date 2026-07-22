@@ -98,3 +98,11 @@ export async function getPayments() {
 export async function addPayment(data) {
   return await request('payment_add', 'POST', data);
 }
+
+export async function getGstAudit(startDate, endDate) {
+  return await request(`gst_audit&start_date=${startDate}&end_date=${endDate}`, 'GET');
+}
+
+export async function getAuditLogs() {
+  return await request('audit_logs', 'GET');
+}

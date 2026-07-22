@@ -126,8 +126,8 @@ export default function CustomersScreen() {
         />
       )}
 
-      <Modal visible={modalVisible} animationType="slide">
-        <SafeAreaView style={styles.modalContainer}>
+      {modalVisible && (
+        <View style={styles.modalOverlayContainer}>
           <KeyboardAvoidingView 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
             style={{ flex: 1 }}
@@ -181,8 +181,8 @@ export default function CustomersScreen() {
               </View>
             </ScrollView>
           </KeyboardAvoidingView>
-        </SafeAreaView>
-      </Modal>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -438,5 +438,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#ffffff',
     fontWeight: '700',
+  },
+  modalOverlayContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#ffffff',
+    zIndex: 999,
   },
 });

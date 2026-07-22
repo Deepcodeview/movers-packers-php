@@ -121,6 +121,11 @@ export default function DashboardScreen({ user, onLogout, navigation }) {
             <Text style={styles.menuIcon}>💸</Text>
             <Text style={styles.menuItemText}>Collections (Receipts)</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItemCardLarge} onPress={() => navigation.navigate('Operations', { activeSegment: 'audits' })}>
+            <Text style={styles.menuIcon}>📋</Text>
+            <Text style={styles.menuItemText}>GST & System Audits</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Shifting Trend Analytics Chart */}

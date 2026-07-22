@@ -148,12 +148,25 @@ export default function PaymentsScreen() {
                 </View>
                 <Text style={styles.payAmtText}>₹{parseFloat(item.amount).toLocaleString('en-IN')}</Text>
               </View>
-              <TouchableOpacity 
-                style={styles.printShareBtn} 
-                onPress={() => Linking.openURL(`https://manage.deepsde.in/payments.php?action=receipt&id=${item.id}`)}
-              >
-                <Text style={styles.printShareBtnText}>🖨️ View / Print Money Receipt Slip</Text>
-              </TouchableOpacity>
+              <View style={styles.cardActionsRow}>
+                <TouchableOpacity 
+                  style={[styles.miniActionBtn, { backgroundColor: '#FFF1EE', borderColor: '#FF5E3A' }]} 
+                  onPress={() => Linking.openURL(`https://manage.deepsde.in/payments.php?action=receipt&id=${item.id}`)}
+                >
+                  <Text style={[styles.miniActionBtnText, { color: '#FF5E3A' }]}>🖨️ View / Print</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.miniActionBtn, { backgroundColor: '#E8F5E9', borderColor: '#2E7D32' }]} 
+                  onPress={() => {
+                    const text = `*Om Gupteswar Packers & Movers*\n\nPayment Receipt recorded:\nReceipt No: REC-${item.id.substring(item.id.length - 6).toUpperCase()}\nAmount Collected: ₹${parseFloat(item.amount).toLocaleString('en-IN')}\nPayment Mode: ${item.payment_mode}\n\nDownload / View Receipt copy:\nhttps://manage.deepsde.in/payments.php?action=receipt&id=${item.id}`;
+                    Linking.openURL(`whatsapp://send?text=${encodeURIComponent(text)}`).catch(() => {
+                      Linking.openURL(`https://wa.me/?text=${encodeURIComponent(text)}`);
+                    });
+                  }}
+                >
+                  <Text style={[styles.miniActionBtnText, { color: '#2E7D32' }]}>💬 WhatsApp Share</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
           ListEmptyComponent={
@@ -161,8 +174,8 @@ export default function PaymentsScreen() {
           }
         />
       )}
-      <Modal visible={modalVisible} animationType="slide">
-        <SafeAreaView style={styles.modalContainer}>
+      {modalVisible && (
+        <View style={styles.modalOverlayContainer}>
           <KeyboardAvoidingView 
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
             style={{ flex: 1 }}
@@ -241,13 +254,13 @@ export default function PaymentsScreen() {
                   <Text style={styles.modalCancelBtnText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.modalSaveBtn} onPress={handleSave} disabled={submitting}>
-                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.modalSaveBtnText}>Save Payment</Text>}
+                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Payment</Text>}
                 </TouchableOpacity>
               </View>
             </ScrollView>
           </KeyboardAvoidingView>
-        </SafeAreaView>
-      </Modal>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -529,6 +542,33 @@ const styles = StyleSheet.create({
   modalSaveBtnText: {
     fontSize: 14,
     color: '#ffffff',
+    fontWeight: '700',
+  },
+  modalOverlayContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#ffffff',
+    zIndex: 999,
+  },
+  cardActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  miniActionBtn: {
+    flex: 1,
+    height: 36,
+    borderRadius: 6,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 4,
+  },
+  miniActionBtnText: {
+    fontSize: 11,
     fontWeight: '700',
   },
 });
