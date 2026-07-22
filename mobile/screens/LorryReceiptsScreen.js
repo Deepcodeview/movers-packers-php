@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, Linking } from 'react-native';
 import { getLorryReceipts, getInvoices, getQuotations, getCustomers, addLorryReceipt } from '../utils/api';
 import { Picker } from '@react-native-picker/picker';
 
@@ -205,6 +205,12 @@ export default function LorryReceiptsScreen() {
                 <Text style={styles.lrVehicle}>Truck: {item.vehicle_number || 'N/A'}</Text>
                 <Text style={styles.lrFreight}>Freight: ₹{parseFloat(item.freight_charges).toLocaleString('en-IN')}</Text>
               </View>
+              <TouchableOpacity 
+                style={styles.printShareBtn} 
+                onPress={() => Linking.openURL(`https://manage.deepsde.in/lorry_receipts.php?action=view&id=${item.id}`)}
+              >
+                <Text style={styles.printShareBtnText}>🖨️ View / Print Lorry Receipt (Bilty)</Text>
+              </TouchableOpacity>
             </View>
           )}
           ListEmptyComponent={
@@ -332,16 +338,16 @@ export default function LorryReceiptsScreen() {
                   </View>
                 </View>
 
-              </ScrollView>
+                <View style={[styles.modalActions, { marginTop: 20 }]}>
+                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                    <Text style={styles.cancelBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
+                    {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Bilty</Text>}
+                  </TouchableOpacity>
+                </View>
 
-              <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                  <Text style={styles.cancelBtnText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Bilty</Text>}
-                </TouchableOpacity>
-              </View>
+              </ScrollView>
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -543,6 +549,21 @@ const styles = StyleSheet.create({
   saveBtnText: {
     fontSize: 14,
     color: '#ffffff',
+    fontWeight: '700',
+  },
+  printShareBtn: {
+    marginTop: 10,
+    backgroundColor: '#FFF1EE',
+    borderWidth: 1,
+    borderColor: '#FF5E3A',
+    borderRadius: 6,
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  printShareBtnText: {
+    fontSize: 12,
+    color: '#FF5E3A',
     fontWeight: '700',
   },
 });

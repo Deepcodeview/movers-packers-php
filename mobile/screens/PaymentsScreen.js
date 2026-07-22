@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform, Linking } from 'react-native';
 import { getPayments, getInvoices, addPayment, getCustomers } from '../utils/api';
 import { Picker } from '@react-native-picker/picker';
 
@@ -148,6 +148,12 @@ export default function PaymentsScreen() {
                 </View>
                 <Text style={styles.payAmtText}>₹{parseFloat(item.amount).toLocaleString('en-IN')}</Text>
               </View>
+              <TouchableOpacity 
+                style={styles.printShareBtn} 
+                onPress={() => Linking.openURL(`https://manage.deepsde.in/payments.php?action=receipt&id=${item.id}`)}
+              >
+                <Text style={styles.printShareBtnText}>🖨️ View / Print Money Receipt Slip</Text>
+              </TouchableOpacity>
             </View>
           )}
           ListEmptyComponent={
@@ -221,16 +227,16 @@ export default function PaymentsScreen() {
                   <TextInput style={styles.input} placeholder="e.g. Received by hand / driver" value={remarks} onChangeText={setRemarks} />
                 </View>
 
-              </ScrollView>
+                <View style={[styles.modalActions, { marginTop: 20 }]}>
+                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                    <Text style={styles.cancelBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
+                    {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Payment</Text>}
+                  </TouchableOpacity>
+                </View>
 
-              <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                  <Text style={styles.cancelBtnText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Payment</Text>}
-                </TouchableOpacity>
-              </View>
+              </ScrollView>
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -434,6 +440,21 @@ const styles = StyleSheet.create({
   saveBtnText: {
     fontSize: 14,
     color: '#ffffff',
+    fontWeight: '700',
+  },
+  printShareBtn: {
+    marginTop: 10,
+    backgroundColor: '#FFF1EE',
+    borderWidth: 1,
+    borderColor: '#FF5E3A',
+    borderRadius: 6,
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  printShareBtnText: {
+    fontSize: 12,
+    color: '#FF5E3A',
     fontWeight: '700',
   },
 });

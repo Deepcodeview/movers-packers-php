@@ -164,16 +164,16 @@ export default function CustomersScreen() {
                   <Text style={styles.label}>GSTIN (GST Number)</Text>
                   <TextInput style={styles.input} placeholder="Optional 15-digit code" autoCapitalize="characters" value={gstin} onChangeText={setGstin} />
                 </View>
-              </ScrollView>
 
-              <View style={styles.modalActions}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                  <Text style={styles.cancelBtnText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Client</Text>}
-                </TouchableOpacity>
-              </View>
+                <View style={[styles.modalActions, { marginTop: 20 }]}>
+                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                    <Text style={styles.cancelBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
+                    {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Client</Text>}
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
             </View>
           </View>
         </KeyboardAvoidingView>
