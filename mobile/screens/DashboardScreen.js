@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, RefreshControl, ActivityIndicator, Dimensions, TouchableOpacity, SafeAreaView } from 'react';
+import { StyleSheet, Text, View, ScrollView, RefreshControl, ActivityIndicator, Dimensions, TouchableOpacity, SafeAreaView } from 'react-native';
 import { getDashboard, logout } from '../utils/api';
 import { LineChart } from 'react-native-chart-kit';
 
