@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ScrollView, RefreshControl, ActivityIndicator, 
 import { getDashboard, logout } from '../utils/api';
 import { LineChart } from 'react-native-chart-kit';
 
-export default function DashboardScreen({ user, onLogout }) {
+export default function DashboardScreen({ user, onLogout, navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [data, setData] = useState(null);
@@ -92,6 +92,35 @@ export default function DashboardScreen({ user, onLogout }) {
             <Text style={styles.kpiLabel}>Total Clients</Text>
             <Text style={styles.kpiValue}>{metrics.total_customers || 0}</Text>
           </View>
+        </View>
+
+        {/* Quick Menu / Access Directory */}
+        <Text style={styles.menuTitle}>Quick Actions & Modules</Text>
+        <View style={styles.menuGrid}>
+          <TouchableOpacity style={styles.menuItemCardSmall} onPress={() => navigation.navigate('Clients')}>
+            <Text style={styles.menuIcon}>👥</Text>
+            <Text style={styles.menuItemText}>Clients</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItemCardSmall} onPress={() => navigation.navigate('Quotations')}>
+            <Text style={styles.menuIcon}>📄</Text>
+            <Text style={styles.menuItemText}>Quotations</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItemCardSmall} onPress={() => navigation.navigate('Invoices')}>
+            <Text style={styles.menuIcon}>🧾</Text>
+            <Text style={styles.menuItemText}>Invoices</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItemCardLarge} onPress={() => navigation.navigate('Operations', { activeSegment: 'bilty' })}>
+            <Text style={styles.menuIcon}>🚛</Text>
+            <Text style={styles.menuItemText}>Lorry Receipts (Bilty)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItemCardLarge} onPress={() => navigation.navigate('Operations', { activeSegment: 'payments' })}>
+            <Text style={styles.menuIcon}>💸</Text>
+            <Text style={styles.menuItemText}>Collections (Receipts)</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Shifting Trend Analytics Chart */}
@@ -289,5 +318,60 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#475569',
     fontWeight: '500',
+  },
+  menuTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginTop: 10,
+    marginBottom: 12,
+  },
+  menuGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  menuItemCardSmall: {
+    width: '31%',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 10,
+  },
+  menuItemCardLarge: {
+    width: '48%',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 10,
+  },
+  menuIcon: {
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  menuItemText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#475569',
+    textAlign: 'center',
   },
 });

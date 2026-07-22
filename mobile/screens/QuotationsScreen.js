@@ -210,7 +210,7 @@ export default function QuotationsScreen() {
           <View style={styles.modalBg}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>New Shifting Quotation</Text>
-              <ScrollView style={styles.formScroll}>
+              <ScrollView style={styles.formScroll} contentContainerStyle={{ paddingBottom: 20 }}>
                 
                 {/* Customer Selector */}
                 <View style={styles.inputGroup}>
@@ -453,6 +453,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 30,
     maxHeight: '90%',
   },
   modalTitle: {

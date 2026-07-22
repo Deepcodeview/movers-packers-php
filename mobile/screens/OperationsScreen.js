@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import LorryReceiptsScreen from './LorryReceiptsScreen';
 import PaymentsScreen from './PaymentsScreen';
 
-export default function OperationsScreen() {
+export default function OperationsScreen({ route }) {
   const [activeSegment, setActiveSegment] = useState('bilty'); // 'bilty' or 'payments'
+
+  useEffect(() => {
+    if (route?.params?.activeSegment) {
+      setActiveSegment(route.params.activeSegment);
+    }
+  }, [route?.params?.activeSegment]);
 
   return (
     <SafeAreaView style={styles.container}>

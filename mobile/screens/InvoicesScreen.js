@@ -207,7 +207,7 @@ export default function InvoicesScreen() {
           <View style={styles.modalBg}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>New GST Shifting Invoice</Text>
-              <ScrollView style={styles.formScroll}>
+              <ScrollView style={styles.formScroll} contentContainerStyle={{ paddingBottom: 20 }}>
                 
                 {/* Quotation Selector link */}
                 <View style={styles.inputGroup}>
@@ -471,6 +471,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 30,
     maxHeight: '90%',
   },
   modalTitle: {

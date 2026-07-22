@@ -134,7 +134,7 @@ export default function CustomersScreen() {
           <View style={styles.modalBg}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Register New Customer</Text>
-              <ScrollView style={styles.formScroll}>
+              <ScrollView style={styles.formScroll} contentContainerStyle={{ paddingBottom: 20 }}>
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>Customer Name *</Text>
                   <TextInput style={styles.input} placeholder="e.g. Deepak Pandey" value={name} onChangeText={setName} />
@@ -306,6 +306,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 30,
     maxHeight: '85%',
   },
   modalTitle: {
