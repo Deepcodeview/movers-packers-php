@@ -162,6 +162,16 @@ export default function QuotationsScreen() {
     return c ? c.name : 'Unknown Customer';
   };
 
+  const getCustomerMobile = (cId) => {
+    const c = customers.find(item => item.id === cId);
+    if (!c || !c.phone) return '';
+    let cleaned = c.phone.replace(/[^0-9]/g, '');
+    if (cleaned.length === 10) {
+      cleaned = '91' + cleaned;
+    }
+    return cleaned;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Bar */}
@@ -204,8 +214,11 @@ export default function QuotationsScreen() {
                   style={[styles.miniActionBtn, { backgroundColor: '#E8F5E9', borderColor: '#2E7D32' }]} 
                   onPress={() => {
                     const text = `*Om Gupteswar Packers & Movers*\n\nShifting Quotation details:\nQuotation No: ${item.quotation_number}\nAmount: ₹${parseFloat(item.grand_total).toLocaleString('en-IN')}\nRoute: ${item.from_city} to ${item.to_city}\n\nDownload / View Quotation PDF link:\nhttps://manage.deepsde.in/quotations.php?action=view&id=${item.id}`;
-                    Linking.openURL(`whatsapp://send?text=${encodeURIComponent(text)}`).catch(() => {
-                      Linking.openURL(`https://wa.me/?text=${encodeURIComponent(text)}`);
+                    const phone = getCustomerMobile(item.customer_id);
+                    const waUrl = phone ? `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}` : `whatsapp://send?text=${encodeURIComponent(text)}`;
+                    const fbUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+                    Linking.openURL(waUrl).catch(() => {
+                      Linking.openURL(fbUrl);
                     });
                   }}
                 >

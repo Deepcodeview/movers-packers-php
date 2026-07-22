@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Linking } from 'react-native';
-import { getGstAudit, getAuditLogs } from '../utils/api';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Linking } from 'react-native';
+import { getGstAudit } from '../utils/api';
 
 export default function AuditsScreen() {
-  const [subSegment, setSubSegment] = useState('gst'); // 'gst' or 'logs'
   const [loading, setLoading] = useState(false);
 
   // GST audit dates
@@ -15,16 +14,9 @@ export default function AuditsScreen() {
   const [endDate, setEndDate] = useState(lastDay);
   const [gstData, setGstData] = useState({ invoices: [], totals: {} });
 
-  // Logs state
-  const [logs, setLogs] = useState([]);
-
   useEffect(() => {
-    if (subSegment === 'gst') {
-      fetchGstAudit();
-    } else {
-      fetchLogs();
-    }
-  }, [subSegment]);
+    fetchGstAudit();
+  }, []);
 
   const fetchGstAudit = async () => {
     setLoading(true);
@@ -43,22 +35,8 @@ export default function AuditsScreen() {
     }
   };
 
-  const fetchLogs = async () => {
-    setLoading(true);
-    try {
-      const res = await getAuditLogs();
-      if (res.success) {
-        setLogs(res.logs || []);
-      }
-    } catch (e) {
-      Alert.alert('Error', 'Failed to retrieve audit log data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const shareGstReport = () => {
-    const shareText = `GST Return Report (${startDate} to ${endDate})\nGross Sales: ₹${parseFloat(gstData.totals.sales || 0).toLocaleString('en-IN')}\nTotal Tax: ₹${parseFloat(gstData.totals.gst || 0).toLocaleString('en-IN')}\nView Audit Center: https://manage.deepsde.in/gst_audit.php?start_date=${startDate}&end_date=${endDate}`;
+    const shareText = `*GST Return Report (${startDate} to ${endDate})*\n\nGross Sales: ₹${parseFloat(gstData.totals.sales || 0).toLocaleString('en-IN')}\nTotal Tax: ₹${parseFloat(gstData.totals.gst || 0).toLocaleString('en-IN')}\n\nView Audit Center: https://manage.deepsde.in/gst_audit.php?start_date=${startDate}&end_date=${endDate}`;
     Linking.openURL(`whatsapp://send?text=${encodeURIComponent(shareText)}`).catch(() => {
       Linking.openURL(`https://wa.me/?text=${encodeURIComponent(shareText)}`);
     });
@@ -66,27 +44,15 @@ export default function AuditsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Sub tabs picker */}
-      <View style={styles.tabBar}>
-        <TouchableOpacity 
-          style={[styles.tabBtn, subSegment === 'gst' && styles.activeTabBtn]} 
-          onPress={() => setSubSegment('gst')}
-        >
-          <Text style={[styles.tabBtnText, subSegment === 'gst' && styles.activeTabBtnText]}>📊 GST Returns Audit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tabBtn, subSegment === 'logs' && styles.activeTabBtn]} 
-          onPress={() => setSubSegment('logs')}
-        >
-          <Text style={[styles.tabBtnText, subSegment === 'logs' && styles.activeTabBtnText]}>📋 System Logs</Text>
-        </TouchableOpacity>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>📊 GST Return Audit Helper</Text>
       </View>
 
       {loading ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#FF5E3A" />
         </View>
-      ) : subSegment === 'gst' ? (
+      ) : (
         <ScrollView style={styles.scrollContainer} contentContainerStyle={{ padding: 16 }}>
           {/* Date controls */}
           <View style={styles.card}>
@@ -177,28 +143,6 @@ export default function AuditsScreen() {
             ))
           )}
         </ScrollView>
-      ) : (
-        /* Audit Logs List */
-        <FlatList
-          data={logs}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16 }}
-          renderItem={({ item }) => (
-            <View style={styles.logCard}>
-              <View style={styles.logHeader}>
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{item.action_type}</Text>
-                </View>
-                <Text style={styles.logTime}>{item.timestamp}</Text>
-              </View>
-              <Text style={styles.logDesc}>{item.description}</Text>
-              <Text style={styles.logUser}>👤 User: {item.user_name || 'System'}</Text>
-            </View>
-          )}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>No audit activity logs recorded yet.</Text>
-          }
-        />
       )}
     </View>
   );
@@ -209,28 +153,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8FAFC',
   },
-  tabBar: {
-    flexDirection: 'row',
+  header: {
     backgroundColor: '#ffffff',
+    paddingVertical: 15,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
-    padding: 6,
   },
-  tabBtn: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 6,
-  },
-  activeTabBtn: {
-    backgroundColor: '#F1F5F9',
-  },
-  tabBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#64748B',
-  },
-  activeTabBtnText: {
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: '800',
     color: '#0F172A',
   },
   centerContainer: {
@@ -415,46 +347,5 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     textAlign: 'right',
     marginTop: 4,
-  },
-  logCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 10,
-  },
-  logHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  badge: {
-    backgroundColor: '#F1F5F9',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 4,
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#475569',
-    textTransform: 'uppercase',
-  },
-  logTime: {
-    fontSize: 10,
-    color: '#94A3B8',
-  },
-  logDesc: {
-    fontSize: 13,
-    color: '#334155',
-    lineHeight: 18,
-  },
-  logUser: {
-    fontSize: 11,
-    color: '#64748B',
-    marginTop: 6,
-    fontWeight: '600',
   },
 });

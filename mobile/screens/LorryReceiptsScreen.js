@@ -216,8 +216,15 @@ export default function LorryReceiptsScreen() {
                   style={[styles.miniActionBtn, { backgroundColor: '#E8F5E9', borderColor: '#2E7D32' }]} 
                   onPress={() => {
                     const text = `*Om Gupteswar Packers & Movers*\n\nLorry Receipt (Bilty) details:\nBilty No: ${item.lr_no}\nConsignee: ${item.consignee_name}\nRoute: ${item.from_address} to ${item.to_address}\nVehicle No: ${item.vehicle_number || 'N/A'}\n\nDownload / View Bilty PDF link:\nhttps://manage.deepsde.in/lorry_receipts.php?action=view&id=${item.id}`;
-                    Linking.openURL(`whatsapp://send?text=${encodeURIComponent(text)}`).catch(() => {
-                      Linking.openURL(`https://wa.me/?text=${encodeURIComponent(text)}`);
+                    const rawPhone = item.consignee_mobile || item.consignor_mobile || '';
+                    let phone = rawPhone.replace(/[^0-9]/g, '');
+                    if (phone.length === 10) {
+                      phone = '91' + phone;
+                    }
+                    const waUrl = phone ? `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}` : `whatsapp://send?text=${encodeURIComponent(text)}`;
+                    const fbUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+                    Linking.openURL(waUrl).catch(() => {
+                      Linking.openURL(fbUrl);
                     });
                   }}
                 >

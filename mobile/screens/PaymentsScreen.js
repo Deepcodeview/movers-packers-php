@@ -109,6 +109,18 @@ export default function PaymentsScreen() {
     return c ? c.name : 'Unknown Customer';
   };
 
+  const getCustomerMobileFromInvoice = (invId) => {
+    const inv = invoices.find(item => item.id === invId);
+    if (!inv) return '';
+    const c = customers.find(item => item.id === inv.customer_id);
+    if (!c || !c.phone) return '';
+    let cleaned = c.phone.replace(/[^0-9]/g, '');
+    if (cleaned.length === 10) {
+      cleaned = '91' + cleaned;
+    }
+    return cleaned;
+  };
+
   const getInvoiceNumber = (invId) => {
     const inv = invoices.find(item => item.id === invId);
     return inv ? inv.invoice_number : 'N/A';
@@ -159,8 +171,11 @@ export default function PaymentsScreen() {
                   style={[styles.miniActionBtn, { backgroundColor: '#E8F5E9', borderColor: '#2E7D32' }]} 
                   onPress={() => {
                     const text = `*Om Gupteswar Packers & Movers*\n\nPayment Receipt recorded:\nReceipt No: REC-${item.id.substring(item.id.length - 6).toUpperCase()}\nAmount Collected: ₹${parseFloat(item.amount).toLocaleString('en-IN')}\nPayment Mode: ${item.payment_mode}\n\nDownload / View Receipt copy:\nhttps://manage.deepsde.in/payments.php?action=receipt&id=${item.id}`;
-                    Linking.openURL(`whatsapp://send?text=${encodeURIComponent(text)}`).catch(() => {
-                      Linking.openURL(`https://wa.me/?text=${encodeURIComponent(text)}`);
+                    const phone = getCustomerMobileFromInvoice(item.invoice_id);
+                    const waUrl = phone ? `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}` : `whatsapp://send?text=${encodeURIComponent(text)}`;
+                    const fbUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+                    Linking.openURL(waUrl).catch(() => {
+                      Linking.openURL(fbUrl);
                     });
                   }}
                 >

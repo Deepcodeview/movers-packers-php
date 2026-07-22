@@ -153,6 +153,16 @@ export default function InvoicesScreen() {
     return c ? c.name : 'Unknown Customer';
   };
 
+  const getCustomerMobile = (cId) => {
+    const c = customers.find(item => item.id === cId);
+    if (!c || !c.phone) return '';
+    let cleaned = c.phone.replace(/[^0-9]/g, '');
+    if (cleaned.length === 10) {
+      cleaned = '91' + cleaned;
+    }
+    return cleaned;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Bar */}
@@ -202,8 +212,11 @@ export default function InvoicesScreen() {
                   style={[styles.miniActionBtn, { backgroundColor: '#E8F5E9', borderColor: '#2E7D32' }]} 
                   onPress={() => {
                     const text = `*Om Gupteswar Packers & Movers*\n\nTax Invoice details for shifting:\nInvoice No: ${item.invoice_number}\nAmount: ₹${parseFloat(item.grand_total).toLocaleString('en-IN')}\n\nDownload / View Invoice PDF link:\nhttps://manage.deepsde.in/invoices.php?action=view&id=${item.id}`;
-                    Linking.openURL(`whatsapp://send?text=${encodeURIComponent(text)}`).catch(() => {
-                      Linking.openURL(`https://wa.me/?text=${encodeURIComponent(text)}`);
+                    const phone = getCustomerMobile(item.customer_id);
+                    const waUrl = phone ? `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}` : `whatsapp://send?text=${encodeURIComponent(text)}`;
+                    const fbUrl = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+                    Linking.openURL(waUrl).catch(() => {
+                      Linking.openURL(fbUrl);
                     });
                   }}
                 >
