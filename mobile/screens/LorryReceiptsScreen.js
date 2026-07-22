@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { getLorryReceipts, getInvoices, getQuotations, getCustomers, addLorryReceipt } from '../utils/api';
 import { Picker } from '@react-native-picker/picker';
 
@@ -112,6 +112,11 @@ export default function LorryReceiptsScreen() {
     }
   };
 
+  const getCustomerName = (cId) => {
+    const c = customers.find(item => item.id === cId);
+    return c ? c.name : 'Unknown Customer';
+  };
+
   const handleSave = async () => {
     if (!invoiceId) {
       Alert.alert('Validation Error', 'Please choose an invoice to link.');
@@ -208,134 +213,138 @@ export default function LorryReceiptsScreen() {
         />
       )}
 
-      {/* Add LR Bilty modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalBg}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>New Transport Bilty</Text>
-            <ScrollView style={styles.formScroll}>
-              
-              {/* Select invoice link */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Select Linked Invoice *</Text>
-                <View style={styles.pickerBorder}>
-                  <Picker
-                    selectedValue={invoiceId}
-                    onValueChange={handleInvoiceChange}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="-- Choose Invoice --" value="" />
-                    {invoices.map(i => (
-                      <Picker.Item key={i.id} label={`${i.invoice_number} - ${getCustomerName(i.customer_id)}`} value={i.id} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-
-              {/* Consignor details */}
-              <Text style={styles.sectionHeading}>Consignor (Sender) Details</Text>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Sender / Company Name</Text>
-                <TextInput style={styles.input} value={consignorName} onChangeText={setConsignorName} />
-              </View>
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Sender Mobile</Text>
-                  <TextInput style={styles.input} value={consignorMobile} onChangeText={setConsignorMobile} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Sender GSTIN</Text>
-                  <TextInput style={styles.input} autoCapitalize="characters" value={consignorGstin} onChangeText={setConsignorGstin} />
-                </View>
-              </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Origin Starting Address</Text>
-                <TextInput style={styles.input} value={fromAddress} onChangeText={setFromAddress} />
-              </View>
-
-              {/* Consignee details */}
-              <Text style={styles.sectionHeading}>Consignee (Receiver) Details</Text>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Receiver Name *</Text>
-                <TextInput style={styles.input} value={consigneeName} onChangeText={setConsigneeName} />
-              </View>
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Receiver Mobile *</Text>
-                  <TextInput style={styles.input} value={consigneeMobile} onChangeText={setConsigneeMobile} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Receiver GSTIN</Text>
-                  <TextInput style={styles.input} autoCapitalize="characters" value={consigneeGstin} onChangeText={setConsigneeGstin} />
-                </View>
-              </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Delivery Destination Address</Text>
-                <TextInput style={styles.input} value={toAddress} onChangeText={setToAddress} />
-              </View>
-
-              {/* Transit Carriage specs */}
-              <Text style={styles.sectionHeading}>Carriage & Dispatch Specifications</Text>
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Vehicle Number</Text>
-                  <TextInput style={styles.input} autoCapitalize="characters" value={vehicleNumber} onChangeText={setVehicleNumber} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Driver Name</Text>
-                  <TextInput style={styles.input} value={driverName} onChangeText={setDriverName} />
-                </View>
-              </View>
-              
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Articles Count (Boxes/Packages)</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={articlesCount} onChangeText={setArticlesCount} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Goods Value Amount (₹)</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={goodsValue} onChangeText={setGoodsValue} />
-                </View>
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Description of Shifting Goods</Text>
-                <TextInput style={[styles.input, { height: 60 }]} multiline value={description} onChangeText={setDescription} />
-              </View>
-
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Freight Freight Charges (₹)</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={freightCharges} onChangeText={setFreightCharges} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Billing Terms Type</Text>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={{ flex: 1 }}
+        >
+          <View style={styles.modalBg}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>New Transport Bilty</Text>
+              <ScrollView style={styles.formScroll}>
+                
+                {/* Select invoice link */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Select Linked Invoice *</Text>
                   <View style={styles.pickerBorder}>
                     <Picker
-                      selectedValue={toPayBilling}
-                      onValueChange={setToPayBilling}
+                      selectedValue={invoiceId}
+                      onValueChange={handleInvoiceChange}
                       style={styles.picker}
                     >
-                      <Picker.Item label="To Pay" value="To Pay" />
-                      <Picker.Item label="Paid" value="Paid" />
-                      <Picker.Item label="T.B.B. (To Be Billed)" value="T.B.B." />
+                      <Picker.Item label="-- Choose Invoice --" value="" />
+                      {invoices.map(i => (
+                        <Picker.Item key={i.id} label={`${i.invoice_number} - ${getCustomerName(i.customer_id)}`} value={i.id} />
+                      ))}
                     </Picker>
                   </View>
                 </View>
+
+                {/* Consignor details */}
+                <Text style={styles.sectionHeading}>Consignor (Sender) Details</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Sender / Company Name</Text>
+                  <TextInput style={styles.input} value={consignorName} onChangeText={setConsignorName} />
+                </View>
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Sender Mobile</Text>
+                    <TextInput style={styles.input} value={consignorMobile} onChangeText={setConsignorMobile} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Sender GSTIN</Text>
+                    <TextInput style={styles.input} autoCapitalize="characters" value={consignorGstin} onChangeText={setConsignorGstin} />
+                  </View>
+                </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Origin Starting Address</Text>
+                  <TextInput style={styles.input} value={fromAddress} onChangeText={setFromAddress} />
+                </View>
+
+                {/* Consignee details */}
+                <Text style={styles.sectionHeading}>Consignee (Receiver) Details</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Receiver Name *</Text>
+                  <TextInput style={styles.input} value={consigneeName} onChangeText={setConsigneeName} />
+                </View>
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Receiver Mobile *</Text>
+                    <TextInput style={styles.input} value={consigneeMobile} onChangeText={setConsigneeMobile} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Receiver GSTIN</Text>
+                    <TextInput style={styles.input} autoCapitalize="characters" value={consigneeGstin} onChangeText={setConsigneeGstin} />
+                  </View>
+                </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Delivery Destination Address</Text>
+                  <TextInput style={styles.input} value={toAddress} onChangeText={setToAddress} />
+                </View>
+
+                {/* Transit Carriage specs */}
+                <Text style={styles.sectionHeading}>Carriage & Dispatch Specifications</Text>
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Vehicle Number</Text>
+                    <TextInput style={styles.input} autoCapitalize="characters" value={vehicleNumber} onChangeText={setVehicleNumber} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Driver Name</Text>
+                    <TextInput style={styles.input} value={driverName} onChangeText={setDriverName} />
+                  </View>
+                </View>
+                
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Articles Count (Boxes/Packages)</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={articlesCount} onChangeText={setArticlesCount} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Goods Value Amount (₹)</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={goodsValue} onChangeText={setGoodsValue} />
+                  </View>
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Description of Shifting Goods</Text>
+                  <TextInput style={[styles.input, { height: 60 }]} multiline value={description} onChangeText={setDescription} />
+                </View>
+
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Freight Freight Charges (₹)</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={freightCharges} onChangeText={setFreightCharges} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Billing Terms Type</Text>
+                    <View style={styles.pickerBorder}>
+                      <Picker
+                        selectedValue={toPayBilling}
+                        onValueChange={setToPayBilling}
+                        style={styles.picker}
+                      >
+                        <Picker.Item label="To Pay" value="To Pay" />
+                        <Picker.Item label="Paid" value="Paid" />
+                        <Picker.Item label="T.B.B. (To Be Billed)" value="T.B.B." />
+                      </Picker>
+                    </View>
+                  </View>
+                </View>
+
+              </ScrollView>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
+                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Bilty</Text>}
+                </TouchableOpacity>
               </View>
-
-            </ScrollView>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Bilty</Text>}
-              </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );

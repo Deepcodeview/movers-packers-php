@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { getCustomers, addCustomer } from '../utils/api';
 
 export default function CustomersScreen() {
@@ -126,53 +126,57 @@ export default function CustomersScreen() {
         />
       )}
 
-      {/* Add Customer Modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalBg}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Register New Customer</Text>
-            <ScrollView style={styles.formScroll}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Customer Name *</Text>
-                <TextInput style={styles.input} placeholder="e.g. Deepak Pandey" value={name} onChangeText={setName} />
-              </View>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={{ flex: 1 }}
+        >
+          <View style={styles.modalBg}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Register New Customer</Text>
+              <ScrollView style={styles.formScroll}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Customer Name *</Text>
+                  <TextInput style={styles.input} placeholder="e.g. Deepak Pandey" value={name} onChangeText={setName} />
+                </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Mobile Phone Number *</Text>
-                <TextInput style={styles.input} placeholder="e.g. +91 99999 88888" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
-              </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Mobile Phone Number *</Text>
+                  <TextInput style={styles.input} placeholder="e.g. +91 99999 88888" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
+                </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email Address</Text>
-                <TextInput style={styles.input} placeholder="e.g. client@mail.com" keyboardType="email-address" value={email} onChangeText={setEmail} />
-              </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Email Address</Text>
+                  <TextInput style={styles.input} placeholder="e.g. client@mail.com" keyboardType="email-address" value={email} onChangeText={setEmail} />
+                </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Full Shifting Address</Text>
-                <TextInput style={styles.input} placeholder="Origin detail address" value={address} onChangeText={setAddress} />
-              </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Full Shifting Address</Text>
+                  <TextInput style={styles.input} placeholder="Origin detail address" value={address} onChangeText={setAddress} />
+                </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>State Name (Important for GST splits)</Text>
-                <TextInput style={styles.input} placeholder="e.g. Odisha / West Bengal" value={state} onChangeText={setState} />
-              </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>State Name (Important for GST splits)</Text>
+                  <TextInput style={styles.input} placeholder="e.g. Odisha / West Bengal" value={state} onChangeText={setState} />
+                </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>GSTIN (GST Number)</Text>
-                <TextInput style={styles.input} placeholder="Optional 15-digit code" autoCapitalize="characters" value={gstin} onChangeText={setGstin} />
-              </View>
-            </ScrollView>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>GSTIN (GST Number)</Text>
+                  <TextInput style={styles.input} placeholder="Optional 15-digit code" autoCapitalize="characters" value={gstin} onChangeText={setGstin} />
+                </View>
+              </ScrollView>
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Client</Text>}
-              </TouchableOpacity>
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
+                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Client</Text>}
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );

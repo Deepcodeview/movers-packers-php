@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { getPayments, getInvoices, addPayment, getCustomers } from '../utils/api';
 import { Picker } from '@react-native-picker/picker';
 
@@ -156,80 +156,84 @@ export default function PaymentsScreen() {
         />
       )}
 
-      {/* Record Payment modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalBg}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Record Collection Payment</Text>
-            <ScrollView style={styles.formScroll}>
-              
-              {/* Select invoice link */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Select Invoice *</Text>
-                <View style={styles.pickerBorder}>
-                  <Picker
-                    selectedValue={invoiceId}
-                    onValueChange={handleInvoiceChange}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="-- Choose Invoice --" value="" />
-                    {invoices.filter(i => parseFloat(i.outstanding_balance) > 0).map(i => (
-                      <Picker.Item key={i.id} label={`#${i.invoice_number} - ${getCustomerNameFromInvoice(i.id)} (Bal: ₹${parseFloat(i.outstanding_balance)})`} value={i.id} />
-                    ))}
-                  </Picker>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={{ flex: 1 }}
+        >
+          <View style={styles.modalBg}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Record Collection Payment</Text>
+              <ScrollView style={styles.formScroll}>
+                
+                {/* Select invoice link */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Select Invoice *</Text>
+                  <View style={styles.pickerBorder}>
+                    <Picker
+                      selectedValue={invoiceId}
+                      onValueChange={handleInvoiceChange}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="-- Choose Invoice --" value="" />
+                      {invoices.filter(i => parseFloat(i.outstanding_balance) > 0).map(i => (
+                        <Picker.Item key={i.id} label={`#${i.invoice_number} - ${getCustomerNameFromInvoice(i.id)} (Bal: ₹${parseFloat(i.outstanding_balance)})`} value={i.id} />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
-              </View>
 
-              {/* Amount input */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Collection Amount (₹) *</Text>
-                <TextInput style={styles.input} keyboardType="numeric" value={amount} onChangeText={setAmount} />
-                {maxAmount !== null && (
-                  <Text style={styles.helperLabel}>Remaining outstanding: ₹{maxAmount.toLocaleString('en-IN')}</Text>
-                )}
-              </View>
-
-              {/* Payment Mode */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Payment Method</Text>
-                <View style={styles.pickerBorder}>
-                  <Picker
-                    selectedValue={paymentMode}
-                    onValueChange={setPaymentMode}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="Cash" value="Cash" />
-                    <Picker.Item label="Bank Transfer" value="Bank Transfer" />
-                    <Picker.Item label="UPI / QR Scan" value="UPI" />
-                    <Picker.Item label="Cheque" value="Cheque" />
-                  </Picker>
+                {/* Amount input */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Collection Amount (₹) *</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={amount} onChangeText={setAmount} />
+                  {maxAmount !== null && (
+                    <Text style={styles.helperLabel}>Remaining outstanding: ₹{maxAmount.toLocaleString('en-IN')}</Text>
+                  )}
                 </View>
+
+                {/* Payment Mode */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Payment Method</Text>
+                  <View style={styles.pickerBorder}>
+                    <Picker
+                      selectedValue={paymentMode}
+                      onValueChange={setPaymentMode}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Cash" value="Cash" />
+                      <Picker.Item label="Bank Transfer" value="Bank Transfer" />
+                      <Picker.Item label="UPI / QR Scan" value="UPI" />
+                      <Picker.Item label="Cheque" value="Cheque" />
+                    </Picker>
+                  </View>
+                </View>
+
+                {/* Ref Number */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Transaction Reference / UPI ID</Text>
+                  <TextInput style={styles.input} placeholder="Optional transaction ID" value={referenceNumber} onChangeText={setReferenceNumber} />
+                </View>
+
+                {/* Remarks */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Internal Remarks</Text>
+                  <TextInput style={styles.input} placeholder="e.g. Received by hand / driver" value={remarks} onChangeText={setRemarks} />
+                </View>
+
+              </ScrollView>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
+                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Payment</Text>}
+                </TouchableOpacity>
               </View>
-
-              {/* Ref Number */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Transaction Reference / UPI ID</Text>
-                <TextInput style={styles.input} placeholder="Optional transaction ID" value={referenceNumber} onChangeText={setReferenceNumber} />
-              </View>
-
-              {/* Remarks */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Internal Remarks</Text>
-                <TextInput style={styles.input} placeholder="e.g. Received by hand / driver" value={remarks} onChangeText={setRemarks} />
-              </View>
-
-            </ScrollView>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Payment</Text>}
-              </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );

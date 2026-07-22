@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Modal, ActivityIndicator, Alert, SafeAreaView, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { getInvoices, getCustomers, getQuotations, addInvoice } from '../utils/api';
 import { Picker } from '@react-native-picker/picker';
 
@@ -199,155 +199,159 @@ export default function InvoicesScreen() {
         />
       )}
 
-      {/* Add Invoice modal */}
       <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalBg}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>New GST Shifting Invoice</Text>
-            <ScrollView style={styles.formScroll}>
-              
-              {/* Quotation Selector link */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Link Approved Quotation (Optional)</Text>
-                <View style={styles.pickerBorder}>
-                  <Picker
-                    selectedValue={quotationId}
-                    onValueChange={handleQuotationChange}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="-- Choose Quotation --" value="" />
-                    {quotations.map(q => (
-                      <Picker.Item key={q.id} label={`${q.quotation_number} - ${getCustomerName(q.customer_id)}`} value={q.id} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-
-              {/* Customer Selector */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Select Customer *</Text>
-                <View style={styles.pickerBorder}>
-                  <Picker
-                    selectedValue={customerId}
-                    onValueChange={setCustomerId}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="-- Select Customer --" value="" />
-                    {customers.map(c => (
-                      <Picker.Item key={c.id} label={c.name} value={c.id} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-
-              {/* Routing */}
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>From City *</Text>
-                  <TextInput style={styles.input} placeholder="Origin" value={fromCity} onChangeText={setFromCity} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>To City *</Text>
-                  <TextInput style={styles.input} placeholder="Destination" value={toCity} onChangeText={setToCity} />
-                </View>
-              </View>
-
-              {/* Shifting vehicle details */}
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Truck / Vehicle No.</Text>
-                  <TextInput style={styles.input} placeholder="e.g. OD-02-B-5555" autoCapitalize="characters" value={vehicleNumber} onChangeText={setVehicleNumber} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Driver Name</Text>
-                  <TextInput style={styles.input} placeholder="e.g. Suresh Kumar" value={driverName} onChangeText={setDriverName} />
-                </View>
-              </View>
-
-              {/* Invoice Breakdown */}
-              <Text style={styles.sectionHeading}>Tax Invoice Service Particulars (₹)</Text>
-              
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Freight / Escort Charges</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={freight} onChangeText={setFreight} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Packing Charges</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={packing} onChangeText={setPacking} />
-                </View>
-              </View>
-
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Loading Charges</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={loadingCharge} onChangeText={setLoadingCharge} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Unloading Charges</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={unloading} onChangeText={setUnloading} />
-                </View>
-              </View>
-
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>Unpacking Charges</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={unpacking} onChangeText={setUnpacking} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Other Transit Charges</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={escort} onChangeText={setEscort} />
-                </View>
-              </View>
-
-              <View style={styles.row}>
-                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                  <Text style={styles.label}>GST Tax Rate (%)</Text>
-                  <TextInput style={styles.input} keyboardType="numeric" value={gstRate} onChangeText={setGstRate} />
-                </View>
-                <View style={[styles.inputGroup, { flex: 1 }]}>
-                  <Text style={styles.label}>Calculate GST On</Text>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={{ flex: 1 }}
+        >
+          <View style={styles.modalBg}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>New GST Shifting Invoice</Text>
+              <ScrollView style={styles.formScroll}>
+                
+                {/* Quotation Selector link */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Link Approved Quotation (Optional)</Text>
                   <View style={styles.pickerBorder}>
                     <Picker
-                      selectedValue={gstType}
-                      onValueChange={setGstType}
+                      selectedValue={quotationId}
+                      onValueChange={handleQuotationChange}
                       style={styles.picker}
                     >
-                      <Picker.Item label="Full Amount Subtotal" value="full_amount" />
-                      <Picker.Item label="Freight Only" value="freight_only" />
+                      <Picker.Item label="-- Choose Quotation --" value="" />
+                      {quotations.map(q => (
+                        <Picker.Item key={q.id} label={`${q.quotation_number} - ${getCustomerName(q.customer_id)}`} value={q.id} />
+                      ))}
                     </Picker>
                   </View>
                 </View>
+
+                {/* Customer Selector */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Select Customer *</Text>
+                  <View style={styles.pickerBorder}>
+                    <Picker
+                      selectedValue={customerId}
+                      onValueChange={setCustomerId}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="-- Select Customer --" value="" />
+                      {customers.map(c => (
+                        <Picker.Item key={c.id} label={c.name} value={c.id} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                {/* Routing */}
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>From City *</Text>
+                    <TextInput style={styles.input} placeholder="Origin" value={fromCity} onChangeText={setFromCity} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>To City *</Text>
+                    <TextInput style={styles.input} placeholder="Destination" value={toCity} onChangeText={setToCity} />
+                  </View>
+                </View>
+
+                {/* Shifting vehicle details */}
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Truck / Vehicle No.</Text>
+                    <TextInput style={styles.input} placeholder="e.g. OD-02-B-5555" autoCapitalize="characters" value={vehicleNumber} onChangeText={setVehicleNumber} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Driver Name</Text>
+                    <TextInput style={styles.input} placeholder="e.g. Suresh Kumar" value={driverName} onChangeText={setDriverName} />
+                  </View>
+                </View>
+
+                {/* Invoice Breakdown */}
+                <Text style={styles.sectionHeading}>Tax Invoice Service Particulars (₹)</Text>
+                
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Freight / Escort Charges</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={freight} onChangeText={setFreight} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Packing Charges</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={packing} onChangeText={setPacking} />
+                  </View>
+                </View>
+
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Loading Charges</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={loadingCharge} onChangeText={setLoadingCharge} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Unloading Charges</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={unloading} onChangeText={setUnloading} />
+                  </View>
+                </View>
+
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>Unpacking Charges</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={unpacking} onChangeText={setUnpacking} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Other Transit Charges</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={escort} onChangeText={setEscort} />
+                  </View>
+                </View>
+
+                <View style={styles.row}>
+                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                    <Text style={styles.label}>GST Tax Rate (%)</Text>
+                    <TextInput style={styles.input} keyboardType="numeric" value={gstRate} onChangeText={setGstRate} />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 1 }]}>
+                    <Text style={styles.label}>Calculate GST On</Text>
+                    <View style={styles.pickerBorder}>
+                      <Picker
+                        selectedValue={gstType}
+                        onValueChange={setGstType}
+                        style={styles.picker}
+                      >
+                        <Picker.Item label="Full Amount Subtotal" value="full_amount" />
+                        <Picker.Item label="Freight Only" value="freight_only" />
+                      </Picker>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Real-time Summary Box */}
+                <View style={styles.summaryBox}>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>Subtotal Shifting Cost:</Text>
+                    <Text style={styles.summaryValue}>₹{getSubtotal().toLocaleString('en-IN')}</Text>
+                  </View>
+                  <View style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>GST ({gstRate}%):</Text>
+                    <Text style={styles.summaryValue}>₹{getGstAmount().toLocaleString('en-IN')}</Text>
+                  </View>
+                  <View style={[styles.summaryRow, styles.totalBorder]}>
+                    <Text style={styles.totalLabel}>Billing Grand Total:</Text>
+                    <Text style={styles.totalValue}>₹{getGrandTotal().toLocaleString('en-IN')}</Text>
+                  </View>
+                </View>
+
+              </ScrollView>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
+                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Invoice</Text>}
+                </TouchableOpacity>
               </View>
-
-              {/* Real-time Summary Box */}
-              <View style={styles.summaryBox}>
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>Subtotal Shifting Cost:</Text>
-                  <Text style={styles.summaryValue}>₹{getSubtotal().toLocaleString('en-IN')}</Text>
-                </View>
-                <View style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>GST ({gstRate}%):</Text>
-                  <Text style={styles.summaryValue}>₹{getGstAmount().toLocaleString('en-IN')}</Text>
-                </View>
-                <View style={[styles.summaryRow, styles.totalBorder]}>
-                  <Text style={styles.totalLabel}>Billing Grand Total:</Text>
-                  <Text style={styles.totalValue}>₹{getGrandTotal().toLocaleString('en-IN')}</Text>
-                </View>
-              </View>
-
-            </ScrollView>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Invoice</Text>}
-              </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
