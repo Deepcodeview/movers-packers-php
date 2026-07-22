@@ -1,0 +1,14 @@
+# System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE configs
+.vscode/
+.idea/
+*.suo
+*.user
+*.userossc
+*.sln
+*.docstates
