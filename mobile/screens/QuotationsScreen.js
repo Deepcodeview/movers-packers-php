@@ -207,144 +207,147 @@ export default function QuotationsScreen() {
         />
       )}
 
-      {/* Add Quotation Drawer Modal */}
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-          style={{ flex: 1 }}
-        >
-          <View style={styles.modalBg}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>New Shifting Quotation</Text>
-              <ScrollView style={styles.formScroll} contentContainerStyle={{ paddingBottom: 20 }}>
-                
-                {/* Customer Selector */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Select Customer *</Text>
-                  <View style={styles.pickerBorder}>
-                    <Picker
-                      selectedValue={customerId}
-                      onValueChange={(val) => {
-                        setCustomerId(val);
-                        const c = customers.find(item => item.id === val);
-                        if (c) setPhone(c.phone);
-                      }}
-                      style={styles.picker}
-                    >
-                      <Picker.Item label="-- Select Customer --" value="" />
-                      {customers.map(c => (
-                        <Picker.Item key={c.id} label={`${c.name} (${c.phone})`} value={c.id} />
-                      ))}
-                    </Picker>
-                  </View>
-                </View>
-
-                {/* Transport Routing */}
-                <View style={styles.row}>
-                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                    <Text style={styles.label}>From City *</Text>
-                    <TextInput style={styles.input} placeholder="Origin" value={fromCity} onChangeText={setFromCity} />
-                  </View>
-                  <View style={[styles.inputGroup, { flex: 1 }]}>
-                    <Text style={styles.label}>To City *</Text>
-                    <TextInput style={styles.input} placeholder="Destination" value={toCity} onChangeText={setToCity} />
-                  </View>
-                </View>
-
-                {/* Items Inventory Checklist */}
-                <Text style={styles.sectionHeading}>Inventory Items Checklist</Text>
-                <View style={styles.checklistCard}>
-                  {Object.keys(checklist).map(key => (
-                    <View key={key} style={styles.checkRow}>
-                      <Text style={styles.checkItemName}>{key}</Text>
-                      <View style={styles.stepperContainer}>
-                        <TouchableOpacity style={styles.stepBtn} onPress={() => handleQtyChange(key, 'minus')}>
-                          <Text style={styles.stepBtnText}>-</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.stepVal}>{checklist[key]}</Text>
-                        <TouchableOpacity style={[styles.stepBtn, styles.stepPlusBtn]} onPress={() => handleQtyChange(key, 'plus')}>
-                          <Text style={[styles.stepBtnText, styles.stepPlusText]}>+</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-
-                {/* Shifting Estimations Rates */}
-                <Text style={styles.sectionHeading}>Transportation Cost Breakdown (₹)</Text>
-                <View style={styles.row}>
-                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                    <Text style={styles.label}>Packing Charges</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={packing} onChangeText={setPacking} />
-                  </View>
-                  <View style={[styles.inputGroup, { flex: 1 }]}>
-                    <Text style={styles.label}>Unpacking Charges</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={unpacking} onChangeText={setUnpacking} />
-                  </View>
-                </View>
-
-                <View style={styles.row}>
-                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                    <Text style={styles.label}>Loading Charges</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={loadingCharge} onChangeText={setLoadingCharge} />
-                  </View>
-                  <View style={[styles.inputGroup, { flex: 1 }]}>
-                    <Text style={styles.label}>Unloading Charges</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={unloading} onChangeText={setUnloading} />
-                  </View>
-                </View>
-
-                <View style={styles.row}>
-                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                    <Text style={styles.label}>Storage Charges</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={storage} onChangeText={setStorage} />
-                  </View>
-                  <View style={[styles.inputGroup, { flex: 1 }]}>
-                    <Text style={styles.label}>Transit Insurance</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={insurance} onChangeText={setInsurance} />
-                  </View>
-                </View>
-
-                <View style={styles.row}>
-                  <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                    <Text style={styles.label}>Escort Charges</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={escort} onChangeText={setEscort} />
-                  </View>
-                  <View style={[styles.inputGroup, { flex: 1 }]}>
-                    <Text style={styles.label}>GST Tax Rate (%)</Text>
-                    <TextInput style={styles.input} keyboardType="numeric" value={gstRate} onChangeText={setGstRate} />
-                  </View>
-                </View>
-
-                {/* Real-time Summary Box */}
-                <View style={styles.summaryBox}>
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>Subtotal Shifting Cost:</Text>
-                    <Text style={styles.summaryValue}>₹{getSubtotal().toLocaleString('en-IN')}</Text>
-                  </View>
-                  <View style={styles.summaryRow}>
-                    <Text style={styles.summaryLabel}>GST ({gstRate}%):</Text>
-                    <Text style={styles.summaryValue}>₹{getGstAmount().toLocaleString('en-IN')}</Text>
-                  </View>
-                  <View style={[styles.summaryRow, styles.totalBorder]}>
-                    <Text style={styles.totalLabel}>Estimated Grand Total:</Text>
-                    <Text style={styles.totalValue}>₹{getGrandTotal().toLocaleString('en-IN')}</Text>
-                  </View>
-                </View>
-
-                <View style={[styles.modalActions, { marginTop: 20 }]}>
-                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                    <Text style={styles.cancelBtnText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                    {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Generate Quote</Text>}
-                  </TouchableOpacity>
-                </View>
-
-              </ScrollView>
+      <Modal visible={modalVisible} animationType="slide">
+        <SafeAreaView style={styles.modalContainer}>
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+            style={{ flex: 1 }}
+          >
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitleText}>New Shifting Quotation</Text>
+              <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setModalVisible(false)}>
+                <Text style={styles.modalCloseBtnText}>✕</Text>
+              </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
+
+            <ScrollView style={styles.modalFormScroll} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+              
+              {/* Customer Selector */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Select Customer *</Text>
+                <View style={styles.pickerBorder}>
+                  <Picker
+                    selectedValue={customerId}
+                    onValueChange={(val) => {
+                      setCustomerId(val);
+                      const c = customers.find(item => item.id === val);
+                      if (c) setPhone(c.phone);
+                    }}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="-- Select Customer --" value="" />
+                    {customers.map(c => (
+                      <Picker.Item key={c.id} label={`${c.name} (${c.phone})`} value={c.id} />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* Transport Routing */}
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                  <Text style={styles.label}>From City *</Text>
+                  <TextInput style={styles.input} placeholder="Origin" value={fromCity} onChangeText={setFromCity} />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.label}>To City *</Text>
+                  <TextInput style={styles.input} placeholder="Destination" value={toCity} onChangeText={setToCity} />
+                </View>
+              </View>
+
+              {/* Items Inventory Checklist */}
+              <Text style={styles.sectionHeading}>Inventory Items Checklist</Text>
+              <View style={styles.checklistCard}>
+                {Object.keys(checklist).map(key => (
+                  <View key={key} style={styles.checkRow}>
+                    <Text style={styles.checkItemName}>{key}</Text>
+                    <View style={styles.stepperContainer}>
+                      <TouchableOpacity style={styles.stepBtn} onPress={() => handleQtyChange(key, 'minus')}>
+                        <Text style={styles.stepBtnText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.stepVal}>{checklist[key]}</Text>
+                      <TouchableOpacity style={[styles.stepBtn, styles.stepPlusBtn]} onPress={() => handleQtyChange(key, 'plus')}>
+                        <Text style={[styles.stepBtnText, styles.stepPlusText]}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+
+              {/* Shifting Estimations Rates */}
+              <Text style={styles.sectionHeading}>Transportation Cost Breakdown (₹)</Text>
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                  <Text style={styles.label}>Packing Charges</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={packing} onChangeText={setPacking} />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.label}>Unpacking Charges</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={unpacking} onChangeText={setUnpacking} />
+                </View>
+              </View>
+
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                  <Text style={styles.label}>Loading Charges</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={loadingCharge} onChangeText={setLoadingCharge} />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.label}>Unloading Charges</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={unloading} onChangeText={setUnloading} />
+                </View>
+              </View>
+
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                  <Text style={styles.label}>Storage Charges</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={storage} onChangeText={setStorage} />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.label}>Transit Insurance</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={insurance} onChangeText={setInsurance} />
+                </View>
+              </View>
+
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
+                  <Text style={styles.label}>Escort Charges</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={escort} onChangeText={setEscort} />
+                </View>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.label}>GST Tax Rate (%)</Text>
+                  <TextInput style={styles.input} keyboardType="numeric" value={gstRate} onChangeText={setGstRate} />
+                </View>
+              </View>
+
+              {/* Real-time Summary Box */}
+              <View style={styles.summaryBox}>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>Subtotal Shifting Cost:</Text>
+                  <Text style={styles.summaryValue}>₹{getSubtotal().toLocaleString('en-IN')}</Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>GST ({gstRate}%):</Text>
+                  <Text style={styles.summaryValue}>₹{getGstAmount().toLocaleString('en-IN')}</Text>
+                </View>
+                <View style={[styles.summaryRow, styles.totalBorder]}>
+                  <Text style={styles.totalLabel}>Estimated Grand Total:</Text>
+                  <Text style={styles.totalValue}>₹{getGrandTotal().toLocaleString('en-IN')}</Text>
+                </View>
+              </View>
+
+              <View style={styles.modalActionsRow}>
+                <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                  <Text style={styles.modalCancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalSaveBtn} onPress={handleSave} disabled={submitting}>
+                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.modalSaveBtnText}>Generate Quote</Text>}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
@@ -649,6 +652,71 @@ const styles = StyleSheet.create({
   printShareBtnText: {
     fontSize: 12,
     color: '#FF5E3A',
+    fontWeight: '700',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+    backgroundColor: '#ffffff',
+  },
+  modalTitleText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  modalCloseBtn: {
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: '#F1F5F9',
+  },
+  modalCloseBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  modalFormScroll: {
+    flex: 1,
+  },
+  modalActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 24,
+  },
+  modalCancelBtn: {
+    flex: 1,
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  modalCancelBtnText: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  modalSaveBtn: {
+    flex: 2,
+    height: 48,
+    backgroundColor: '#FF5E3A',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSaveBtnText: {
+    fontSize: 14,
+    color: '#ffffff',
     fontWeight: '700',
   },
 });

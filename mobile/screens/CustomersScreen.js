@@ -126,57 +126,62 @@ export default function CustomersScreen() {
         />
       )}
 
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-          style={{ flex: 1 }}
-        >
-          <View style={styles.modalBg}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Register New Customer</Text>
-              <ScrollView style={styles.formScroll} contentContainerStyle={{ paddingBottom: 20 }}>
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Customer Name *</Text>
-                  <TextInput style={styles.input} placeholder="e.g. Deepak Pandey" value={name} onChangeText={setName} />
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Mobile Phone Number *</Text>
-                  <TextInput style={styles.input} placeholder="e.g. +91 99999 88888" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Email Address</Text>
-                  <TextInput style={styles.input} placeholder="e.g. client@mail.com" keyboardType="email-address" value={email} onChangeText={setEmail} />
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Full Shifting Address</Text>
-                  <TextInput style={styles.input} placeholder="Origin detail address" value={address} onChangeText={setAddress} />
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>State Name (Important for GST splits)</Text>
-                  <TextInput style={styles.input} placeholder="e.g. Odisha / West Bengal" value={state} onChangeText={setState} />
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>GSTIN (GST Number)</Text>
-                  <TextInput style={styles.input} placeholder="Optional 15-digit code" autoCapitalize="characters" value={gstin} onChangeText={setGstin} />
-                </View>
-
-                <View style={[styles.modalActions, { marginTop: 20 }]}>
-                  <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
-                    <Text style={styles.cancelBtnText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={submitting}>
-                    {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.saveBtnText}>Save Client</Text>}
-                  </TouchableOpacity>
-                </View>
-              </ScrollView>
+      <Modal visible={modalVisible} animationType="slide">
+        <SafeAreaView style={styles.modalContainer}>
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+            style={{ flex: 1 }}
+          >
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitleText}>Register New Customer</Text>
+              <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setModalVisible(false)}>
+                <Text style={styles.modalCloseBtnText}>✕</Text>
+              </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
+
+            <ScrollView style={styles.modalFormScroll} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Customer Name *</Text>
+                <TextInput style={styles.input} placeholder="e.g. Deepak Pandey" value={name} onChangeText={setName} />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Mobile Phone Number *</Text>
+                <TextInput style={styles.input} placeholder="e.g. +91 99999 88888" keyboardType="phone-pad" value={phone} onChangeText={setPhone} />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email Address</Text>
+                <TextInput style={styles.input} placeholder="e.g. client@mail.com" keyboardType="email-address" value={email} onChangeText={setEmail} />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Full Shifting Address</Text>
+                <TextInput style={styles.input} placeholder="Origin detail address" value={address} onChangeText={setAddress} />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>State Name (Important for GST splits)</Text>
+                <TextInput style={styles.input} placeholder="e.g. Odisha / West Bengal" value={state} onChangeText={setState} />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>GSTIN (GST Number)</Text>
+                <TextInput style={styles.input} placeholder="Optional 15-digit code" autoCapitalize="characters" value={gstin} onChangeText={setGstin} />
+              </View>
+
+              <View style={styles.modalActionsRow}>
+                <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setModalVisible(false)} disabled={submitting}>
+                  <Text style={styles.modalCancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalSaveBtn} onPress={handleSave} disabled={submitting}>
+                  {submitting ? <ActivityIndicator color="#ffffff" /> : <Text style={styles.modalSaveBtnText}>Save Client</Text>}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
@@ -365,6 +370,71 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   saveBtnText: {
+    fontSize: 14,
+    color: '#ffffff',
+    fontWeight: '700',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+    backgroundColor: '#ffffff',
+  },
+  modalTitleText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#0F172A',
+  },
+  modalCloseBtn: {
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: '#F1F5F9',
+  },
+  modalCloseBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#64748B',
+  },
+  modalFormScroll: {
+    flex: 1,
+  },
+  modalActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 24,
+  },
+  modalCancelBtn: {
+    flex: 1,
+    height: 48,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  modalCancelBtnText: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  modalSaveBtn: {
+    flex: 2,
+    height: 48,
+    backgroundColor: '#FF5E3A',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSaveBtnText: {
     fontSize: 14,
     color: '#ffffff',
     fontWeight: '700',
